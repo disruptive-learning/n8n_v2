@@ -1,0 +1,67 @@
+{
+  "name": "@disruptive-learning/n8n-nodes-gigstack",
+  "version": "1.1.3",
+  "description": "n8n community node for Gigstack API - Mexican tax compliance, invoicing, and payment processing",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "gigstack",
+    "invoicing",
+    "cfdi",
+    "sat",
+    "mexico",
+    "tax",
+    "payments"
+  ],
+  "license": "MIT",
+  "homepage": "https://gigstack.io",
+  "author": {
+    "name": "Gigstack",
+    "email": "support@gigstack.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gigstack/n8n-nodes-gigstack.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint 'nodes/**/*.ts' 'credentials/**/*.ts' package.json",
+    "lintfix": "eslint 'nodes/**/*.ts' 'credentials/**/*.ts' package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -q",
+    "sync-swagger": "npx ts-node scripts/sync-swagger.ts",
+    "sync-swagger:generate": "npx ts-node scripts/sync-swagger.ts --generate",
+    "build-missing": "npx ts-node scripts/build-missing-operations.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/GigstackApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Gigstack/Gigstack.node.js",
+      "dist/nodes/Gigstack/GigstackTrigger.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.27",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.0",
+    "gulp": "^4.0.2",
+    "n8n-workflow": "^1.20.0",
+    "prettier": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.0",
+    "yaml": "^2.8.2"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
