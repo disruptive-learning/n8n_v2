@@ -140,8 +140,8 @@ For Gigstack Connect users managing multiple teams:
 
 ```bash
 # Clone the repository
-git clone https://github.com/gigstack/n8n-nodes-gigstack.git
-cd n8n-nodes-gigstack
+git clone https://github.com/disruptive-learning/n8n_v2.git
+cd n8n_v2
 
 # Install dependencies
 npm install
@@ -164,7 +164,7 @@ cd ~/.n8n/custom && npm link @disruptive-learning/n8n-nodes-gigstack
 - [Gigstack Website](https://gigstack.io)
 - [Gigstack API Documentation](https://docs.gigstack.io)
 - [n8n Community Nodes](https://docs.n8n.io/integrations/community-nodes/)
-- [Report Issues](https://github.com/gigstack/n8n-nodes-gigstack/issues)
+- [Report Issues](https://github.com/disruptive-learning/n8n_v2/issues)
 
 ---
 
