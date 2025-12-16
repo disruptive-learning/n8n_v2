@@ -83,10 +83,10 @@ export const webhookFields: INodeProperties[] = [
 			{ name: 'Invoice Stamped', value: 'invoice.stamped' },
 			{ name: 'Invoice Cancelled', value: 'invoice.cancelled' },
 			{ name: 'Invoice Sent', value: 'invoice.sent' },
-			// Client events
-			{ name: 'Client Created', value: 'client.created' },
-			{ name: 'Client Updated', value: 'client.updated' },
-			{ name: 'Client Deleted', value: 'client.deleted' },
+			// Customer events
+			{ name: 'Customer Created', value: 'customer.created' },
+			{ name: 'Customer Updated', value: 'customer.updated' },
+			{ name: 'Customer Deleted', value: 'customer.deleted' },
 			// Receipt events
 			{ name: 'Receipt Created', value: 'receipt.created' },
 			{ name: 'Receipt Stamped', value: 'receipt.stamped' },
@@ -189,8 +189,8 @@ export const webhookFields: INodeProperties[] = [
 					{ name: 'Invoice Created', value: 'invoice.created' },
 					{ name: 'Invoice Stamped', value: 'invoice.stamped' },
 					{ name: 'Invoice Cancelled', value: 'invoice.cancelled' },
-					{ name: 'Client Created', value: 'client.created' },
-					{ name: 'Client Updated', value: 'client.updated' },
+					{ name: 'Customer Created', value: 'customer.created' },
+					{ name: 'Customer Updated', value: 'customer.updated' },
 					{ name: 'Receipt Created', value: 'receipt.created' },
 					{ name: 'Receipt Stamped', value: 'receipt.stamped' },
 				],

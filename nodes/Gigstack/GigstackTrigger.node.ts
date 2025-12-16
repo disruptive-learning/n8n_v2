@@ -46,19 +46,19 @@ export class GigstackTrigger implements INodeType {
 				default: [],
 				options: [
 					{
-						name: 'Client Created',
-						value: 'client.created',
-						description: 'Triggered when a new client is created',
+						name: 'Customer Created',
+						value: 'customer.created',
+						description: 'Triggered when a new customer is created',
 					},
 					{
-						name: 'Client Deleted',
-						value: 'client.deleted',
-						description: 'Triggered when a client is deleted',
+						name: 'Customer Deleted',
+						value: 'customer.deleted',
+						description: 'Triggered when a customer is deleted',
 					},
 					{
-						name: 'Client Updated',
-						value: 'client.updated',
-						description: 'Triggered when a client is updated',
+						name: 'Customer Updated',
+						value: 'customer.updated',
+						description: 'Triggered when a customer is updated',
 					},
 					{
 						name: 'Invoice Cancelled',
