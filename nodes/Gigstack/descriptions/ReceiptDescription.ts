@@ -317,6 +317,25 @@ export const receiptFields: INodeProperties[] = [
 		},
 		options: [
 			{
+				displayName: 'Status',
+				name: 'status',
+				type: 'options',
+				options: [
+					{ name: 'Pending', value: 'pending' },
+					{ name: 'Stamped', value: 'stamped' },
+					{ name: 'Canceled', value: 'canceled' },
+				],
+				default: '',
+				description: 'Filter receipts by status',
+			},
+			{
+				displayName: 'Client ID',
+				name: 'client_id',
+				type: 'string',
+				default: '',
+				description: 'Filter receipts by client ID',
+			},
+			{
 				displayName: 'Order By',
 				name: 'orderBy',
 				type: 'options',

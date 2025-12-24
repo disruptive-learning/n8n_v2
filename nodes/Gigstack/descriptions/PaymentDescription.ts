@@ -405,6 +405,44 @@ export const paymentFields: INodeProperties[] = [
 		},
 		options: [
 			{
+				displayName: 'Status',
+				name: 'status',
+				type: 'options',
+				options: [
+					{ name: 'Requires Payment Method', value: 'requires_payment_method' },
+					{ name: 'Succeeded', value: 'succeeded' },
+					{ name: 'Canceled', value: 'canceled' },
+				],
+				default: '',
+				description: 'Filter payments by status',
+			},
+			{
+				displayName: 'Client ID',
+				name: 'client_id',
+				type: 'string',
+				default: '',
+				description: 'Filter payments by client ID',
+			},
+			{
+				displayName: 'Client Email',
+				name: 'email',
+				type: 'string',
+				default: '',
+				placeholder: 'name@email.com',
+				description: 'Filter payments by client email address',
+			},
+			{
+				displayName: 'Currency',
+				name: 'currency',
+				type: 'options',
+				options: [
+					{ name: 'MXN - Mexican Peso', value: 'MXN' },
+					{ name: 'USD - US Dollar', value: 'USD' },
+				],
+				default: '',
+				description: 'Filter payments by currency',
+			},
+			{
 				displayName: 'Order By',
 				name: 'orderBy',
 				type: 'options',

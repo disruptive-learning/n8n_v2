@@ -452,6 +452,25 @@ export const invoiceFields: INodeProperties[] = [
 		},
 		options: [
 			{
+				displayName: 'Status',
+				name: 'status',
+				type: 'options',
+				options: [
+					{ name: 'Valid', value: 'valid' },
+					{ name: 'Canceled', value: 'canceled' },
+					{ name: 'Pending', value: 'pending' },
+				],
+				default: '',
+				description: 'Filter invoices by status',
+			},
+			{
+				displayName: 'Client ID',
+				name: 'client_id',
+				type: 'string',
+				default: '',
+				description: 'Filter invoices by client ID',
+			},
+			{
 				displayName: 'Order By',
 				name: 'orderBy',
 				type: 'options',

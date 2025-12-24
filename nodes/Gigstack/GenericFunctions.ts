@@ -107,6 +107,27 @@ export function buildFilterQuery(filters: IDataObject): IDataObject {
 		qs.team = filters.team;
 	}
 
+	// Status filter (payments, invoices, receipts)
+	if (filters.status) {
+		qs.status = filters.status;
+	}
+
+	// Client filter
+	if (filters.client_id) {
+		qs.client_id = filters.client_id;
+	}
+
+	// Email filter (payments)
+	if (filters.email) {
+		qs.email = filters.email;
+	}
+
+	// Currency filter (payments)
+	if (filters.currency) {
+		qs.currency = filters.currency;
+	}
+
+	// Date filters
 	if (filters.createdAfter) {
 		qs['created[gte]'] = Math.floor(new Date(filters.createdAfter as string).getTime() / 1000);
 	}
