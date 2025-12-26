@@ -252,6 +252,36 @@ export const paymentFields: INodeProperties[] = [
 		},
 		description: 'SAT payment form code',
 	},
+	{
+		displayName: 'Invoice Config',
+		name: 'invoiceConfig',
+		type: 'collection',
+		placeholder: 'Add Invoice Config',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['payment'],
+				operation: ['register'],
+			},
+		},
+		description: 'Configure invoice serie and folio for the generated invoice',
+		options: [
+			{
+				displayName: 'Serie',
+				name: 'serie',
+				type: 'string',
+				default: '',
+				description: 'Invoice serie (e.g., "A", "B"). Leave empty for default.',
+			},
+			{
+				displayName: 'Folio',
+				name: 'folio',
+				type: 'number',
+				default: 0,
+				description: 'Invoice folio number. Leave 0 for automatic increment.',
+			},
+		],
+	},
 
 	// ----------------------------------
 	//         payment: get, cancel, markAsPaid, refund

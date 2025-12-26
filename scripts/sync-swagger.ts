@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'yaml';
 
-const SWAGGER_URL = 'https://storage.googleapis.com/gigstackpro.appspot.com/api-docs/swagger.yaml';
+const SWAGGER_URL = 'https://storage.googleapis.com/gigstackpro.appspot.com/api-docs/swagger-2025-12-26-192731453Z.yaml';
 const DESCRIPTIONS_DIR = path.join(__dirname, '..', 'nodes', 'Gigstack', 'descriptions');
 
 interface SwaggerPath {

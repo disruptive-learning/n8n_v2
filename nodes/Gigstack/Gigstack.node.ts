@@ -497,6 +497,17 @@ export class Gigstack implements INodeType {
 							body.metadata = JSON.parse(additionalFields.metadata as string);
 						}
 
+						// Handle invoice_config
+						const invoiceConfig = this.getNodeParameter('invoiceConfig', i, {}) as IDataObject;
+						if (invoiceConfig && Object.keys(invoiceConfig).length > 0) {
+							const config: IDataObject = {};
+							if (invoiceConfig.serie) config.serie = invoiceConfig.serie;
+							if (invoiceConfig.folio && invoiceConfig.folio !== 0) config.folio = invoiceConfig.folio;
+							if (Object.keys(config).length > 0) {
+								body.invoice_config = config;
+							}
+						}
+
 						responseData = await gigstackApiRequest.call(this, 'POST', '/payments/register', body, qs);
 						responseData = simplifyResponse(responseData);
 					} else if (operation === 'get') {
