@@ -1,6 +1,6 @@
 {
   "name": "@disruptive-learning/n8n-nodes-gigstack",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "n8n community node for Gigstack API - Mexican tax compliance, invoicing, and payment processing",
   "keywords": [
     "n8n-community-node-package",
