@@ -508,6 +508,40 @@ export const paymentFields: INodeProperties[] = [
 				default: '',
 				description: 'Filter payments created before this date',
 			},
+			{
+				displayName: 'Metadata Filters',
+				name: 'metadataFilters',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				default: {},
+				description: 'Filter by metadata fields using key-value pairs',
+				options: [
+					{
+						name: 'filters',
+						displayName: 'Metadata Filter',
+						values: [
+							{
+								displayName: 'Key',
+								name: 'key',
+								type: 'string',
+								default: '',
+								placeholder: 'e.g., order_id',
+								description: 'The metadata field key to filter on',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								placeholder: 'e.g., ORD-12345',
+								description: 'The value to match',
+							},
+						],
+					},
+				],
+			},
 		],
 	},
 

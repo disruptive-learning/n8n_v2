@@ -136,5 +136,18 @@ export function buildFilterQuery(filters: IDataObject): IDataObject {
 		qs['created[lte]'] = Math.floor(new Date(filters.createdBefore as string).getTime() / 1000);
 	}
 
+	// Metadata filters - supports both dot notation (metadata.key) and underscore notation (metadata_key)
+	if (filters.metadataFilters) {
+		const metadataFilters = filters.metadataFilters as IDataObject;
+		const metadataFilterItems = (metadataFilters.filters as IDataObject[]) || [];
+
+		for (const filter of metadataFilterItems) {
+			if (filter.key && filter.value) {
+				// Use dot notation as per API spec: metadata.{key}={value}
+				qs[`metadata.${filter.key}`] = filter.value;
+			}
+		}
+	}
+
 	return qs;
 }
