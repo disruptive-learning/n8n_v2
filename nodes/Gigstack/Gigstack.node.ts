@@ -580,10 +580,23 @@ export class Gigstack implements INodeType {
 						};
 
 						if (additionalFields.currency) body.currency = additionalFields.currency;
+						if (additionalFields.exchange_rate) body.exchange_rate = additionalFields.exchange_rate;
 						if (additionalFields.periodicity) body.periodicity = additionalFields.periodicity;
 						if (additionalFields.payment_form) body.payment_form = additionalFields.payment_form;
+						if (additionalFields.idempotency_key) body.idempotency_key = additionalFields.idempotency_key;
 						if (additionalFields.metadata) {
 							body.metadata = JSON.parse(additionalFields.metadata as string);
+						}
+
+						// Handle invoice_config
+						const invoiceConfig = this.getNodeParameter('invoiceConfig', i, {}) as IDataObject;
+						if (invoiceConfig && Object.keys(invoiceConfig).length > 0) {
+							const config: IDataObject = {};
+							if (invoiceConfig.serie) config.serie = invoiceConfig.serie;
+							if (invoiceConfig.folio && invoiceConfig.folio !== 0) config.folio = invoiceConfig.folio;
+							if (Object.keys(config).length > 0) {
+								body.invoice_config = config;
+							}
 						}
 
 						responseData = await gigstackApiRequest.call(this, 'POST', '/receipts', body, qs);
