@@ -21,6 +21,7 @@ import { receiptOperations, receiptFields } from './descriptions/ReceiptDescript
 import { teamOperations, teamFields } from './descriptions/TeamDescription';
 import { userOperations, userFields } from './descriptions/UserDescription';
 import { webhookOperations, webhookFields } from './descriptions/WebhookDescription';
+import { descargarMasivaOperations, descargarMasivaFields } from './descriptions/DescargarMasivaDescription';
 
 export class Gigstack implements INodeType {
 	description: INodeTypeDescription = {
@@ -81,6 +82,10 @@ export class Gigstack implements INodeType {
 						name: 'Webhook',
 						value: 'webhook',
 					},
+					{
+						name: 'Descarga Masiva (SAT)',
+						value: 'descargarMasiva',
+					},
 				],
 				default: 'client',
 			},
@@ -101,6 +106,8 @@ export class Gigstack implements INodeType {
 			...userFields,
 			...webhookOperations,
 			...webhookFields,
+			...descargarMasivaOperations,
+			...descargarMasivaFields,
 		],
 	};
 
@@ -231,6 +238,10 @@ export class Gigstack implements INodeType {
 					} else if (operation === 'stampPendingReceipts') {
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						responseData = await gigstackApiRequest.call(this, 'POST', `/clients/${clientId}/stamp-pending-receipts`, {}, qs);
+					} else if (operation === 'getSupportDocuments') {
+						const clientId = this.getNodeParameter('clientId', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/clients/${clientId}/support-documents`, {}, qs);
+						responseData = simplifyResponse(responseData);
 					}
 				}
 
@@ -432,6 +443,118 @@ export class Gigstack implements INodeType {
 
 						responseData = await gigstackApiRequest.call(this, 'GET', `/invoices/${invoiceId}/files`, {}, qs);
 						responseData = simplifyResponse(responseData);
+					} else if (operation === 'createDraft') {
+						const clientId = this.getNodeParameter('clientId', i) as string;
+						const itemsData = this.getNodeParameter('items', i) as IDataObject;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+
+						const draftItems = (itemsData.itemValues as IDataObject[]) || [];
+						const processedDraftItems = draftItems.map((item) => {
+							const p: IDataObject = {};
+							if (item.id) p.id = item.id;
+							if (item.description) p.description = item.description;
+							if (item.quantity) p.quantity = item.quantity;
+							if (item.unit_price) p.unit_price = item.unit_price;
+							if (item.product_key) p.product_key = item.product_key;
+							if (item.unit_key) p.unit_key = item.unit_key;
+							if (item.includeIva) {
+								p.taxes = [{ type: 'IVA', rate: 0.16, factor: 'Tasa', withholding: false }];
+							}
+							return p;
+						});
+
+						const body: IDataObject = {
+							client: { id: clientId },
+							items: processedDraftItems,
+						};
+
+						if (additionalFields.currency) body.currency = additionalFields.currency;
+						if (additionalFields.exchange_rate) body.exchange_rate = additionalFields.exchange_rate;
+						if (additionalFields.payment_method) body.payment_method = additionalFields.payment_method;
+						if (additionalFields.payment_form) body.payment_form = additionalFields.payment_form;
+						if (additionalFields.use) body.use = additionalFields.use;
+						if (additionalFields.series) body.series = additionalFields.series;
+						if (additionalFields.metadata) {
+							body.metadata = JSON.parse(additionalFields.metadata as string);
+						}
+
+						responseData = await gigstackApiRequest.call(this, 'POST', '/invoices/draft', body, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getDraft') {
+						const draftId = this.getNodeParameter('draftId', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/invoices/draft/${draftId}`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getAllDrafts') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+
+						if (returnAll) {
+							responseData = await gigstackApiRequestAllItems.call(this, 'GET', '/invoices/draft', {}, qs);
+						} else {
+							const limit = this.getNodeParameter('limit', i) as number;
+							qs.limit = limit;
+							const response = await gigstackApiRequest.call(this, 'GET', '/invoices/draft', {}, qs);
+							responseData = (response.data as IDataObject[]) || [];
+						}
+					} else if (operation === 'updateDraft') {
+						const draftId = this.getNodeParameter('draftId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as IDataObject;
+
+						const body: IDataObject = {};
+						if (updateFields.currency) body.currency = updateFields.currency;
+						if (updateFields.exchange_rate) body.exchange_rate = updateFields.exchange_rate;
+						if (updateFields.payment_method) body.payment_method = updateFields.payment_method;
+						if (updateFields.payment_form) body.payment_form = updateFields.payment_form;
+						if (updateFields.use) body.use = updateFields.use;
+						if (updateFields.series) body.series = updateFields.series;
+						if (updateFields.metadata) {
+							body.metadata = JSON.parse(updateFields.metadata as string);
+						}
+
+						responseData = await gigstackApiRequest.call(this, 'PUT', `/invoices/draft/${draftId}`, body, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'deleteDraft') {
+						const draftId = this.getNodeParameter('draftId', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'DELETE', `/invoices/draft/${draftId}`, {}, qs);
+					} else if (operation === 'stampDraft') {
+						const draftId = this.getNodeParameter('draftId', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'POST', `/invoices/draft/${draftId}/stamp`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'previewDraft') {
+						const draftId = this.getNodeParameter('draftId', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'POST', `/invoices/draft/${draftId}/preview`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getAllSat') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as IDataObject;
+
+						if (filters.type) qs.type = filters.type;
+						if (filters.status) qs.status = filters.status;
+						if (filters.rfc) qs.rfc = filters.rfc;
+
+						if (returnAll) {
+							responseData = await gigstackApiRequestAllItems.call(this, 'GET', '/invoices/sat', {}, qs);
+						} else {
+							const limit = this.getNodeParameter('limit', i) as number;
+							qs.limit = limit;
+							const response = await gigstackApiRequest.call(this, 'GET', '/invoices/sat', {}, qs);
+							responseData = (response.data as IDataObject[]) || [];
+						}
+					} else if (operation === 'getSat') {
+						const satUuid = this.getNodeParameter('satUuid', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/invoices/sat/${satUuid}`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'retryXmlSat') {
+						const satUuid = this.getNodeParameter('satUuid', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'POST', `/invoices/sat/${satUuid}/retry-xml`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'generatePdfSat') {
+						const satUuid = this.getNodeParameter('satUuid', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'POST', `/invoices/sat/${satUuid}/pdf`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getSupportDocuments') {
+						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/invoices/${invoiceId}/support-documents`, {}, qs);
+						responseData = simplifyResponse(responseData);
 					}
 				}
 
@@ -555,6 +678,10 @@ export class Gigstack implements INodeType {
 						if (reason) body.reason = reason;
 
 						responseData = await gigstackApiRequest.call(this, 'POST', `/payments/${paymentId}/refund`, body, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getSupportDocuments') {
+						const paymentId = this.getNodeParameter('paymentId', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/payments/${paymentId}/support-documents`, {}, qs);
 						responseData = simplifyResponse(responseData);
 					}
 				}
@@ -891,6 +1018,65 @@ export class Gigstack implements INodeType {
 					} else if (operation === 'delete') {
 						const webhookId = this.getNodeParameter('webhookId', i) as string;
 						responseData = await gigstackApiRequest.call(this, 'DELETE', `/webhooks/${webhookId}`, {}, qs);
+					}
+				}
+
+				// =====================
+				// DESCARGA MASIVA OPERATIONS
+				// =====================
+				else if (resource === 'descargarMasiva') {
+					if (operation === 'getActivationStatus') {
+						responseData = await gigstackApiRequest.call(this, 'GET', '/invoices/download/activate/status', {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'activate') {
+						responseData = await gigstackApiRequest.call(this, 'POST', '/invoices/download/activate', {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'deactivate') {
+						responseData = await gigstackApiRequest.call(this, 'POST', '/invoices/download/deactivate', {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'createRequest') {
+						const date_from = this.getNodeParameter('date_from', i) as string;
+						const date_to = this.getNodeParameter('date_to', i) as string;
+						const type = this.getNodeParameter('type', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+
+						const body: IDataObject = { date_from, date_to, type };
+						if (additionalFields.rfc) body.rfc = additionalFields.rfc;
+
+						responseData = await gigstackApiRequest.call(this, 'POST', '/invoices/download/request', body, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getRequestStatus') {
+						const request_id = this.getNodeParameter('request_id', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/invoices/download/status/${request_id}`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'downloadPackage') {
+						const package_id = this.getNodeParameter('package_id', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/invoices/download/package/${package_id}`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getSchedule') {
+						responseData = await gigstackApiRequest.call(this, 'GET', '/invoices/download/schedule', {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'updateSchedule') {
+						const enabled = this.getNodeParameter('enabled', i) as boolean;
+						const hour = this.getNodeParameter('hour', i) as number;
+						const types = this.getNodeParameter('types', i) as string[];
+
+						responseData = await gigstackApiRequest.call(this, 'PUT', '/invoices/download/schedule', { enabled, hour, types }, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getScheduleHistory') {
+						responseData = await gigstackApiRequest.call(this, 'GET', '/invoices/download/schedule/history', {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'getInvoiceByUuid') {
+						const uuid = this.getNodeParameter('uuid', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'GET', `/invoices/download/invoice/${uuid}`, {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'enableSync') {
+						responseData = await gigstackApiRequest.call(this, 'POST', '/invoices/download/enable-sync', {}, qs);
+						responseData = simplifyResponse(responseData);
+					} else if (operation === 'updateSyncPeriod') {
+						const sync_from = this.getNodeParameter('sync_from', i) as string;
+						responseData = await gigstackApiRequest.call(this, 'PUT', '/invoices/download/sync-period', { sync_from }, qs);
+						responseData = simplifyResponse(responseData);
 					}
 				}
 

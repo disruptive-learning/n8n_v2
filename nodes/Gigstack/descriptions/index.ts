@@ -6,3 +6,4 @@ export * from './ReceiptDescription';
 export * from './TeamDescription';
 export * from './UserDescription';
 export * from './WebhookDescription';
+export * from './DescargarMasivaDescription';

@@ -60,6 +60,78 @@ export const invoiceOperations: INodeProperties[] = [
 				description: 'Get many payment complement invoices (CFDI type P)',
 				action: 'Get many payment invoices',
 			},
+			{
+				name: 'Create Draft',
+				value: 'createDraft',
+				description: 'Create a draft invoice (not stamped yet)',
+				action: 'Create a draft invoice',
+			},
+			{
+				name: 'Delete Draft',
+				value: 'deleteDraft',
+				description: 'Delete a draft invoice',
+				action: 'Delete a draft invoice',
+			},
+			{
+				name: 'Get Draft',
+				value: 'getDraft',
+				description: 'Get a draft invoice by ID',
+				action: 'Get a draft invoice',
+			},
+			{
+				name: 'Get Many Drafts',
+				value: 'getAllDrafts',
+				description: 'Get many draft invoices',
+				action: 'Get many draft invoices',
+			},
+			{
+				name: 'Preview Draft',
+				value: 'previewDraft',
+				description: 'Generate a preview PDF for a draft invoice',
+				action: 'Preview a draft invoice',
+			},
+			{
+				name: 'Stamp Draft',
+				value: 'stampDraft',
+				description: 'Stamp (finalize) a draft into a real CFDI invoice',
+				action: 'Stamp a draft invoice',
+			},
+			{
+				name: 'Update Draft',
+				value: 'updateDraft',
+				description: 'Update a draft invoice',
+				action: 'Update a draft invoice',
+			},
+			{
+				name: 'Get Many SAT Invoices',
+				value: 'getAllSat',
+				description: 'Get many SAT invoices downloaded via Descarga Masiva',
+				action: 'Get many SAT invoices',
+			},
+			{
+				name: 'Get SAT Invoice',
+				value: 'getSat',
+				description: 'Get a single SAT invoice by UUID',
+				action: 'Get a SAT invoice',
+			},
+			{
+				name: 'Generate SAT Invoice PDF',
+				value: 'generatePdfSat',
+				description: 'Generate a PDF for a received SAT invoice',
+				action: 'Generate SAT invoice PDF',
+			},
+			{
+				name: 'Retry SAT Invoice XML',
+				value: 'retryXmlSat',
+				description: 'Retry XML download for a stuck or errored SAT invoice',
+				action: 'Retry SAT invoice XML',
+			},
+			{
+				name: 'Get Support Documents',
+				value: 'getSupportDocuments',
+				description: 'List support documents attached to an invoice',
+				action: 'Get invoice support documents',
+			},
 		],
 		default: 'getAllIncome',
 	},
@@ -541,6 +613,378 @@ export const invoiceFields: INodeProperties[] = [
 				],
 			},
 		],
+	},
+
+	// ----------------------------------
+	//         invoice: Draft operations
+	// ----------------------------------
+	{
+		displayName: 'Client ID',
+		name: 'clientId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['createDraft'],
+			},
+		},
+		description: 'The ID of the client for this draft invoice',
+	},
+	{
+		displayName: 'Items',
+		name: 'items',
+		type: 'fixedCollection',
+		typeOptions: {
+			multipleValues: true,
+			minValue: 1,
+		},
+		required: true,
+		default: { itemValues: [{}] },
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['createDraft'],
+			},
+		},
+		placeholder: 'Add Item',
+		options: [
+			{
+				name: 'itemValues',
+				displayName: 'Item',
+				values: [
+					{
+						displayName: 'Description',
+						name: 'description',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Quantity',
+						name: 'quantity',
+						type: 'number',
+						default: 1,
+					},
+					{
+						displayName: 'Unit Price',
+						name: 'unit_price',
+						type: 'number',
+						default: 0,
+						typeOptions: { numberPrecision: 2 },
+					},
+					{
+						displayName: 'Product Key (SAT)',
+						name: 'product_key',
+						type: 'string',
+						default: '80141503',
+					},
+					{
+						displayName: 'Unit Key (SAT)',
+						name: 'unit_key',
+						type: 'string',
+						default: 'E48',
+					},
+					{
+						displayName: 'Service ID',
+						name: 'id',
+						type: 'string',
+						default: '',
+						description: 'Service ID to use (inherits service properties)',
+					},
+					{
+						displayName: 'Include IVA 16%',
+						name: 'includeIva',
+						type: 'boolean',
+						default: true,
+					},
+				],
+			},
+		],
+		description: 'Draft invoice line items',
+	},
+	{
+		displayName: 'Additional Fields',
+		name: 'additionalFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['createDraft'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Currency',
+				name: 'currency',
+				type: 'options',
+				options: [
+					{ name: 'MXN - Mexican Peso', value: 'MXN' },
+					{ name: 'USD - US Dollar', value: 'USD' },
+					{ name: 'EUR - Euro', value: 'EUR' },
+				],
+				default: 'MXN',
+			},
+			{
+				displayName: 'Exchange Rate',
+				name: 'exchange_rate',
+				type: 'number',
+				default: 1,
+				typeOptions: { numberPrecision: 4 },
+			},
+			{
+				displayName: 'Payment Method',
+				name: 'payment_method',
+				type: 'options',
+				options: [
+					{ name: 'PUE - Pago en Una Exhibicion', value: 'PUE' },
+					{ name: 'PPD - Pago en Parcialidades o Diferido', value: 'PPD' },
+				],
+				default: 'PUE',
+			},
+			{
+				displayName: 'Payment Form',
+				name: 'payment_form',
+				type: 'string',
+				default: '03',
+				description: 'SAT payment form code (e.g. 03 for transfer)',
+			},
+			{
+				displayName: 'CFDI Use',
+				name: 'use',
+				type: 'string',
+				default: 'G03',
+				description: 'CFDI use code (e.g. G03)',
+			},
+			{
+				displayName: 'Series',
+				name: 'series',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Metadata',
+				name: 'metadata',
+				type: 'json',
+				default: '{}',
+			},
+		],
+	},
+
+	// Draft ID field (get, update, delete, stamp, preview)
+	{
+		displayName: 'Draft ID',
+		name: 'draftId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getDraft', 'updateDraft', 'deleteDraft', 'stampDraft', 'previewDraft'],
+			},
+		},
+		description: 'The ID of the draft invoice',
+	},
+
+	// updateDraft fields
+	{
+		displayName: 'Update Fields',
+		name: 'updateFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['updateDraft'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Currency',
+				name: 'currency',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Exchange Rate',
+				name: 'exchange_rate',
+				type: 'number',
+				default: 1,
+				typeOptions: { numberPrecision: 4 },
+			},
+			{
+				displayName: 'Payment Method',
+				name: 'payment_method',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Payment Form',
+				name: 'payment_form',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'CFDI Use',
+				name: 'use',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Series',
+				name: 'series',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Metadata',
+				name: 'metadata',
+				type: 'json',
+				default: '{}',
+			},
+		],
+	},
+
+	// getAllDrafts
+	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		default: false,
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getAllDrafts'],
+			},
+		},
+		description: 'Whether to return all results or only up to a given limit',
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		default: 50,
+		typeOptions: { minValue: 1, maxValue: 100 },
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getAllDrafts'],
+				returnAll: [false],
+			},
+		},
+		description: 'Max number of results to return',
+	},
+
+	// ----------------------------------
+	//         invoice: SAT Invoices
+	// ----------------------------------
+	{
+		displayName: 'UUID',
+		name: 'satUuid',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getSat', 'retryXmlSat', 'generatePdfSat'],
+			},
+		},
+		description: 'The UUID of the SAT invoice',
+	},
+	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		default: false,
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getAllSat'],
+			},
+		},
+		description: 'Whether to return all results or only up to a given limit',
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		default: 50,
+		typeOptions: { minValue: 1, maxValue: 100 },
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getAllSat'],
+				returnAll: [false],
+			},
+		},
+		description: 'Max number of results to return',
+	},
+	{
+		displayName: 'Filters',
+		name: 'filters',
+		type: 'collection',
+		placeholder: 'Add Filter',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getAllSat'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Type',
+				name: 'type',
+				type: 'options',
+				options: [
+					{ name: 'Received', value: 'received' },
+					{ name: 'Issued', value: 'issued' },
+				],
+				default: '',
+				description: 'Filter by CFDI direction',
+			},
+			{
+				displayName: 'Status',
+				name: 'status',
+				type: 'options',
+				options: [
+					{ name: 'Valid', value: 'valid' },
+					{ name: 'Canceled', value: 'canceled' },
+					{ name: 'Error', value: 'error' },
+				],
+				default: '',
+			},
+			{
+				displayName: 'RFC',
+				name: 'rfc',
+				type: 'string',
+				default: '',
+				description: 'Filter by counterpart RFC',
+			},
+		],
+	},
+
+	// ----------------------------------
+	//         invoice: Support Documents
+	// ----------------------------------
+	{
+		displayName: 'Invoice ID',
+		name: 'invoiceId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getSupportDocuments'],
+			},
+		},
+		description: 'The ID of the invoice',
 	},
 
 	// ----------------------------------

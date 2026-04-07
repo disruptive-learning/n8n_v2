@@ -43,6 +43,12 @@ export const paymentOperations: INodeProperties[] = [
 				action: 'Refund a payment',
 			},
 			{
+				name: 'Get Support Documents',
+				value: 'getSupportDocuments',
+				description: 'List support documents attached to a payment',
+				action: 'Get payment support documents',
+			},
+			{
 				name: 'Register',
 				value: 'register',
 				description: 'Register a new payment (already paid)',
@@ -295,7 +301,7 @@ export const paymentFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['payment'],
-				operation: ['get', 'cancel', 'markAsPaid', 'refund'],
+				operation: ['get', 'cancel', 'markAsPaid', 'refund', 'getSupportDocuments'],
 			},
 		},
 		description: 'The ID of the payment',

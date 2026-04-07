@@ -49,6 +49,12 @@ export const clientOperations: INodeProperties[] = [
 				action: 'Stamp pending receipts',
 			},
 			{
+				name: 'Get Support Documents',
+				value: 'getSupportDocuments',
+				description: 'List support documents attached to a client',
+				action: 'Get client support documents',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update a client',
@@ -327,7 +333,7 @@ export const clientFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['client'],
-				operation: ['get', 'update', 'delete', 'validate', 'stampPendingReceipts'],
+				operation: ['get', 'update', 'delete', 'validate', 'stampPendingReceipts', 'getSupportDocuments'],
 			},
 		},
 		description: 'The ID of the client',
